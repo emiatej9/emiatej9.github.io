@@ -4,7 +4,7 @@
 # IMPORTANT: Set the URL of your site.
 # Set to https://<username>.github.io when hosting on GitHub Pages
 # (unless you are using a custom domain).
-url:                   https://domain.tld
+url: emiatej9.github.io
 
 # IMPORTANT: Set The "base URL" of your site.
 # When your site sits in a subdirectory, set to /<name of directory>
@@ -19,7 +19,7 @@ baseurl:               ''
 lang: ko-kr
 
 # The title of your blog. Used in the sidebar and the browser tab.
-title: Thunder2
+title: 쓰나미꿈의 머리 속
 
 # A short description (~150 chars) of the page used for the meta description tag.
 # Can use markdown, but no more than one paragraph (enforced by `>`)
@@ -29,7 +29,7 @@ description:           >
 
 # A shorter description for the sidebar.
 tagline:               >
-   안녕하세요. 천둥이입니다.
+   안녕하세요. 쓰나미꿈입니다.
 
 # A list of keywords for your blog
 keywords:              []
@@ -48,16 +48,18 @@ author:
 
 # Add links to the sidebar.
 menu:
-  - title:             Machine Learning
-    url:               /ml/
-  - title:             알고리즘 문제
-    url:               /algorithms/
+  - title:             언어처리
+    url:               /nlp/
+  - title:             정보검색
+    url:               /information-retrieval/
+  - title:             문제풀이
+    url:               /problem-solving/
   - title:             미적분학
     url:               /calculus/
-  - title:             Documentation
-    url:               /docs/
-  - title:             About
-    url:               /about/
+  - title:             이커머스
+    url:               /e-commerce/
+
+
 
 # Add links to the footer.
 # Typically you'll want to link to your cookie- or privacy policy (if appliable), etc..
@@ -68,7 +70,7 @@ menu:
 #     url:               /cookies-policy/
 
 # This text will appear in a `<small>` tag in the footer of every page.
-copyright:             © 2018. All rights reserved.
+copyright:             © 2020. All rights reserved.
 
 # Format of the permalinks
 permalink:             /:categories/:year-:month-:day-:title/

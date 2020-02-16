@@ -1,7 +1,7 @@
 ---
 layout: list
 title: 알고리즘 문제
-slug: algorithms
+slug: problem-solving
 menu: true
 order: 2 
 description: >
