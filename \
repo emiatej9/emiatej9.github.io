@@ -1,0 +1,142 @@
+---
+layout: post
+title: GloVe:Global Vectors for Word Representation
+categories: [nlp]
+---
+이번 포스트는 [GloVe: Global Vectors for Word Representation(RS JeffreyPennington. 2014)](https://nlp.stanford.edu/pubs/glove.pdf)
+을 읽고 정리한 글입니다.
+
+## Introduction
+* 의미론적 벡터 공간 모델에서는 각 단어를 하나의 실수 벡터로 표현한다.
+* 많은 방법론들이 단어의 본질이 벡터로 잘 표현됐는지 평가하기 위해 거리, 각도 같은 벡터 연산을 이용한다.
+* 그러나 최근 Mikolov et al.(2013)은 유추에 기반한 평가 체계를 도입해 모델의 차원들에 의미를 
+반영하였고, 분산 표상(distributed representation)의 멀티 클러스터링 개념(Bengio, 2009)을 담아내었다.
+
+$$
+king - queen = man - woman \\
+\text{("king is to queen as man is to woman")}
+$$
+
+* 오늘날 단어 벡터에 학습에 사용되는 두 가지 주요 모델들은 각각 심각한 결점을 갖고 있다.
+    * 전체 행렬을 분해(factorization)하는 방법들(e.g. LSA): 통계 정보는 효과적으로 활용는 반면 유추에서는 성능이 좋지 않다.
+    * 로컬 컨텍스트 윈도우를 사용하는 방법들(e.g. skip-gram): 유추에서는 나을 지 모르나, 코퍼스의 통계 정보가 반영되지 않는다.
+* 본 연구에서는 모델이 벡터 공간 상에서 의미에 대한 선형적인 방향을 만들어내기 위해 필요한 속성들을 분석하고, 
+말뭉치 전체에 대한 log-bilinear 회귀 모델이 이러한 속성들에 적합한지 논의한다. 
+* 말뭉치 수준의 단어 간 동시 등장 횟수를 기반으로 학습하는 specific weighted least squares 모델을 제안하고,
+효과적으로 통계정보를 활용할 수 있음을 보인다.
+
+## Related Work
+* Matrix Factorization Methods
+* Shallow Window-Based Methods
+
+## The Glove Model
+### 문제인식
+* 말뭉치에 등장하는 단어들에 대한 통계는 비지도학습에서 우선적으로 이용할 수 있는 정보이다.
+* 그러나 이 정보에서 단어 의미를 유도하고, 그 의미를 결과 벡터에 반영하는 방법에 대해 여전히 의문이 있다.
+* 이러한 의문에서 본 연구는 말뭉치의 통계를 반영하여 단어를 표현하는 새로운 모델 GloVe를 고안하였다.
+
+<div class="message">
+<strong>NOTE</strong>
+ : 단어의 동시 등장(co-occurence) 횟수 행렬 
+<p>
+단어의 동시 등장 횟수 행렬은 단어 i의 문맥 안에서 단어 j가 등장한 횟수를 나타낸 행렬을 의미한다.
+</p>
+<p>예시:</p>
+<p style="margin-left:10px">
+I like deep learning<br>
+I like NLP<br>
+I enjoy flying
+</p>
+<table style="margin-left: 10px;">
+  <thead>
+    <tr>
+      <th></th>
+      <th style="text-align: center">I</th>
+      <th style="text-align: center">like</th>
+      <th style="text-align: center">enjoy</th>
+      <th style="text-align: center">deep</th>
+      <th style="text-align: center">leanring</th>
+      <th style="text-align: center">NLP</th>
+      <th style="text-align: center">flying</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">I</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">2</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">like</td>
+      <td style="text-align: center">2</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">enjoy</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">deep</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">learning</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">NLP</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">NLP</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+* Notation:
+    * $$X$$: 단어의 동시 발생 횟수 행렬
+    * $$X_{ij}$$: 행렬 $$X$$의 i, j번째 원소 ($$\sum_k X_{ik}$$: 단어 i의 문맥에서 임의의 단어가 등장한 총 횟수)
+    * $$P_{ij}$$: 동시 발생 확률. 단어 i의 문맥에서 단어 j가 나타날 확률 ($$=P(j \lvert i)=X_{ij}/X_i$$)
+* 동시 발생 확률에서 임의의 주제와 관련된 두 단어 i와 j의 의미에 대한 특정 관점(aspect)을 추론할 수 있다.
+    * 예를 들어 열역학과 관련된 구절에서 i=ice와 j=steam이 등장했다고 가정하였을 다음과 같은 표를 생각해보자

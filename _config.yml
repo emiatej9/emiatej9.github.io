@@ -48,10 +48,12 @@ author:
 
 # Add links to the sidebar.
 menu:
-  - title:             언어처리
+  - title:             자연어처리
     url:               /nlp/
   - title:             정보검색
     url:               /information-retrieval/
+  - title:             React.js 
+    url:               /react/
   - title:             문제풀이
     url:               /problem-solving/
   - title:             미적분학
